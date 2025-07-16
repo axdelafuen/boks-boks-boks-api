@@ -10,7 +10,7 @@ type Item struct {
   Amount int
 }
 
-func InitItem(title string, amount int) {
+func InitItem(title string, amount int) *Item{
  var i Item
  i.Id = uuid.New()
  i.Title = title

@@ -10,7 +10,7 @@ type Box struct {
   Items []Item
 }
 
-func InitBox(title String) *Box {
+func InitBox(title string) *Box {
   var b Box
   b.Id = uuid.New()
   b.Title = title
