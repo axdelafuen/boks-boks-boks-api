@@ -1,9 +1,15 @@
-CREATE TABLE IF NOT EXISTS box (
+CREATE TABLE IF NOT EXISTS users (
+  id varchar PRIMARY KEY,
+  username varchar,
+  password varchar
+);
+
+CREATE TABLE IF NOT EXISTS boxs (
   id varchar PRIMARY KEY,
   title varchar
 );
 
-CREATE TABLE IF NOT EXISTS item (
+CREATE TABLE IF NOT EXISTS items (
   id varchar PRIMARY KEY,
   title varchar,
   amount int
@@ -14,6 +20,15 @@ CREATE TABLE IF NOT EXISTS boxes_items (
   itemid varchar,
   
   CONSTRAINT pk_boxes_items PRIMARY KEY(boxid, itemid),
-  FOREIGN KEY (boxid) REFERENCES box(id),
-  FOREIGN KEY (itemid) REFERENCES item(id)
+  FOREIGN KEY (boxid) REFERENCES boxs(id),
+  FOREIGN KEY (itemid) REFERENCES items(id)
+);
+
+CREATE TABLE IF NOT EXISTS users_boxes (
+  userid varchar,
+  boxid varchar,
+
+  CONSTRAINT pk_users_boxes PRIMARY KEY(userid, boxid),
+  FOREIGN KEY (userid) REFERENCES users(id),
+  FOREIGN KEY (boxid) REFERENCES boxs(id)
 );
