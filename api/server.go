@@ -8,12 +8,15 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"main/database"
+	"main/handler"
+	"main/service"
 )
 
 type Server struct {
-	router    *gin.Engine
-	dbManager *database.Manager
-	jwtSecret string
+	router      *gin.Engine
+	dbManager   *database.Manager
+	jwtSecret   string
+	authHandler *handler.AuthHandler
 }
 
 func NewServer() (*Server, error) {
@@ -27,10 +30,15 @@ func NewServer() (*Server, error) {
 		log.Fatal("SECRET_TOKEN env variable is required")
 	}
 
+	authService := service.NewAuthService(dbManager.GetDB(), jwtSecret)
+
+	authHandler := handler.NewAuthHandler(authService)
+
 	server := &Server{
-		router:    gin.Default(),
-		dbManager: dbManager,
-		jwtSecret: jwtSecret,
+		router:      gin.Default(),
+		dbManager:   dbManager,
+		jwtSecret:   jwtSecret,
+		authHandler: authHandler,
 	}
 
 	server.setupRoutes()
@@ -43,9 +51,10 @@ func (s *Server) setupRoutes() {
 			"message": "Hello World!",
 			"status":  "success",
 		}
-
 		c.JSON(http.StatusOK, data)
 	})
+
+	s.router.POST("/login", s.authHandler.Login)
 }
 
 func (s *Server) Run(addr ...string) error {
