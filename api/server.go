@@ -1,57 +1,57 @@
 package api
 
 import (
-  "os"
-  "log"
-  "net/http"
+	"log"
+	"net/http"
+	"os"
 
-  "github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin"
 
-  "main/database"
+	"main/database"
 )
 
 type Server struct {
-  router *gin.Engine
-  dbManager *database.Manager
-  jwtSecret string
+	router    *gin.Engine
+	dbManager *database.Manager
+	jwtSecret string
 }
 
 func NewServer() (*Server, error) {
-  dbManager, err := database.NewManager()
-  if err != nil {
-    return nil, err
-  }
+	dbManager, err := database.NewManager()
+	if err != nil {
+		return nil, err
+	}
 
-  jwtSecret := os.Getenv("SECRET_TOKEN")
-  if jwtSecret == "" {
-    log.Fatal("SECRET_TOKEN env variable is required")
-  }
+	jwtSecret := os.Getenv("SECRET_TOKEN")
+	if jwtSecret == "" {
+		log.Fatal("SECRET_TOKEN env variable is required")
+	}
 
-  server := &Server {
-    router: gin.Default(),
-    dbManager: dbManager,
-    jwtSecret: jwtSecret,
-  }
+	server := &Server{
+		router:    gin.Default(),
+		dbManager: dbManager,
+		jwtSecret: jwtSecret,
+	}
 
-  server.setupRoutes()
-  return server, nil
+	server.setupRoutes()
+	return server, nil
 }
 
 func (s *Server) setupRoutes() {
-  s.router.GET("/hello", func(c *gin.Context) {
-    data := gin.H{
-      "message": "Hello World!",
-      "status": "success",
-    }
+	s.router.GET("/hello", func(c *gin.Context) {
+		data := gin.H{
+			"message": "Hello World!",
+			"status":  "success",
+		}
 
-    c.JSON(http.StatusOK, data)
-  })
+		c.JSON(http.StatusOK, data)
+	})
 }
 
 func (s *Server) Run(addr ...string) error {
-  return s.router.Run(addr...)
+	return s.router.Run(addr...)
 }
 
 func (s *Server) Close() error {
-  return s.dbManager.Close()
+	return s.dbManager.Close()
 }
