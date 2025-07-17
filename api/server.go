@@ -9,6 +9,7 @@ import (
 
 	"main/database"
 	"main/handler"
+	"main/middleware"
 	"main/service"
 )
 
@@ -40,6 +41,9 @@ func NewServer() (*Server, error) {
 		jwtSecret:   jwtSecret,
 		authHandler: authHandler,
 	}
+
+	// Configure CORS middleware
+	server.router.Use(middleware.CORSMiddleware())
 
 	server.setupRoutes()
 	return server, nil
