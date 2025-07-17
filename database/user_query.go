@@ -16,3 +16,7 @@ func SelectUser(db *gorm.DB, username, password string) ([]model.User, error) {
 
 	return user, nil
 }
+
+func InsertUser(db *gorm.DB, newUser *model.User) error {
+	return db.Create(&newUser).Error
+}

@@ -53,8 +53,8 @@ func (s *Server) setupRoutes() {
 		}
 		c.JSON(http.StatusOK, data)
 	})
-
 	s.router.POST("/login", s.authHandler.Login)
+	s.router.POST("/register", s.authHandler.Register)
 }
 
 func (s *Server) Run(addr ...string) error {

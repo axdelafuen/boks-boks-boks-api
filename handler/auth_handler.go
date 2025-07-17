@@ -34,3 +34,19 @@ func (h *AuthHandler) Login(c *gin.Context) {
 
 	response.OKResponse(c, "Login successful", authResponse)
 }
+
+func (h *AuthHandler) Register(c *gin.Context) {
+	var req dto.AuthRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.BadRequestError(c, "Invalid request format: "+err.Error())
+		return
+	}
+
+	if err := h.authService.Register(&req); err != nil {
+		response.BadRequestError(c, "Error while inserting datas: "+err.Error())
+		return
+	}
+
+	response.CreatedResponse(c, "User created", nil)
+}

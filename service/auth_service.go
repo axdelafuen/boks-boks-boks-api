@@ -9,6 +9,7 @@ import (
 	"main/database"
 	"main/dto"
 	"main/middleware"
+	"main/model"
 )
 
 type AuthService struct {
@@ -41,4 +42,14 @@ func (s *AuthService) Login(req *dto.AuthRequest) (*dto.AuthResponse, error) {
 	return &dto.AuthResponse{
 		Token: token,
 	}, nil
+}
+
+func (s *AuthService) Register(req *dto.AuthRequest) error {
+	newUser := model.InitUser(req.Username, req.Password)
+
+	if err := database.InsertUser(s.db, newUser); err != nil {
+		return fmt.Errorf("failed to create user: %w", err.Error())
+	}
+
+	return nil
 }
