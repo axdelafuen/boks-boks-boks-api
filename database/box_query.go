@@ -20,3 +20,7 @@ func SelectBoxes(db *gorm.DB, userID string) ([]model.Box, error) {
 
 	return boxes, nil
 }
+
+func InsertBox(db *gorm.DB, box *model.Box) error {
+	return db.Create(box).Error
+}

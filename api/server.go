@@ -68,6 +68,7 @@ func (s *Server) setupRoutes() {
 	api.Use(middleware.AuthMiddleware(s.jwtSecret))
 	{
 		api.GET("/boxes", s.boxHandler.GetBoxes)
+		api.POST("/boxes", s.boxHandler.CreateBox)
 	}
 }
 

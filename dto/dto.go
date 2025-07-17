@@ -13,3 +13,7 @@ type BoxResponse struct {
 	Id    string `json:"id"`
 	Title string `json:"title"`
 }
+
+type CreateBoxRequest struct {
+	Title string `json:"title" binding:"required,min=1,max=100"`
+}
