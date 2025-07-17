@@ -16,4 +16,3 @@ func CORSMiddleware() gin.HandlerFunc {
 		MaxAge:           12 * time.Hour,
 	})
 }
-

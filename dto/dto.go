@@ -8,3 +8,8 @@ type AuthRequest struct {
 type AuthResponse struct {
 	Token string `json:"token"`
 }
+
+type BoxResponse struct {
+	Id    string `json:"id"`
+	Title string `json:"title"`
+}

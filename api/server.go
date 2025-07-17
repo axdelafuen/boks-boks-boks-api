@@ -18,6 +18,7 @@ type Server struct {
 	dbManager   *database.Manager
 	jwtSecret   string
 	authHandler *handler.AuthHandler
+	boxHandler  *handler.BoxHandler
 }
 
 func NewServer() (*Server, error) {
@@ -32,14 +33,17 @@ func NewServer() (*Server, error) {
 	}
 
 	authService := service.NewAuthService(dbManager.GetDB(), jwtSecret)
+	boxService := service.NewBoxService(dbManager.GetDB())
 
 	authHandler := handler.NewAuthHandler(authService)
+	boxHandler := handler.NewBoxHandler(boxService)
 
 	server := &Server{
 		router:      gin.Default(),
 		dbManager:   dbManager,
 		jwtSecret:   jwtSecret,
 		authHandler: authHandler,
+		boxHandler:  boxHandler,
 	}
 
 	// Configure CORS middleware
@@ -59,6 +63,12 @@ func (s *Server) setupRoutes() {
 	})
 	s.router.POST("/login", s.authHandler.Login)
 	s.router.POST("/register", s.authHandler.Register)
+
+	api := s.router.Group("/api")
+	api.Use(middleware.AuthMiddleware(s.jwtSecret))
+	{
+		api.GET("/boxes", s.boxHandler.GetBoxes)
+	}
 }
 
 func (s *Server) Run(addr ...string) error {
