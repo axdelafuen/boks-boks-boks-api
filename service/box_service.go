@@ -109,3 +109,31 @@ func (s *BoxService) DeleteBox(userID uuid.UUID, boxID string) error {
 
 	return nil
 }
+
+func (s *BoxService) UpdateBox(userID uuid.UUID, req dto.UpdateBoxRequest) error {
+	boxesID, err := database.CheckBoxExist(s.db, userID.String(), req.Id)
+	if err != nil {
+		return fmt.Errorf("failed to fecth data: %w", err)
+	}
+
+	if len(boxesID) == 0 {
+		return fmt.Errorf("box %s is not related to user %s", userID.String(), req.Id)
+	}
+
+	tx := s.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := database.UpdateBox(tx, req.Id, req.Title); err != nil {
+		return fmt.Errorf("fail while updating box: %w", err)
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	return nil
+}

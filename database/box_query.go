@@ -39,6 +39,10 @@ func CheckBoxExist(db *gorm.DB, userID, boxID string) ([]string, error) {
 	return boxIds, nil
 }
 
-func DeleteBox(db *gorm.DB, boxID string) error {
-	return db.Where("id = ?", boxID).Delete(&model.Box{}).Error
+func DeleteBox(db *gorm.DB, id string) error {
+	return db.Where("id = ?", id).Delete(&model.Box{}).Error
+}
+
+func UpdateBox(db *gorm.DB, id, title string) error {
+	return db.Model(&model.Box{}).Where("id = ?", id).UpdateColumn("title", title).Error
 }

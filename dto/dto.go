@@ -28,3 +28,8 @@ type CreateItemRequest struct {
 	Title  string `json:"title" binding:"required,min=1,max=100"`
 	Amount int    `json:"amount" binding:"required,min=1"`
 }
+
+type UpdateBoxRequest struct {
+	Id    string `json:"id"`
+	Title string `json:"title"`
+}

@@ -51,6 +51,7 @@ func (h *BoxHandler) CreateBox(c *gin.Context) {
 	box, err := h.boxService.CreateBox(userID, &req)
 	if err != nil {
 		response.InternalServerError(c, err.Error())
+		return
 	}
 
 	response.CreatedResponse(c, "box successfully created", box)
@@ -71,4 +72,25 @@ func (h *BoxHandler) DeleteBox(c *gin.Context) {
 	}
 
 	response.OKResponse(c, "box and related items deleted", nil)
+}
+
+func (h *BoxHandler) UpdateBox(c *gin.Context) {
+	userID, err := middleware.GetUserIDFromContext(c)
+	if err != nil {
+		response.BadRequestError(c, err.Error())
+		return
+	}
+
+	var req dto.UpdateBoxRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.BadRequestError(c, "invalid request format: "+err.Error())
+		return
+	}
+
+	if err := h.boxService.UpdateBox(userID, req); err != nil {
+		response.InternalServerError(c, err.Error())
+		return
+	}
+
+	response.OKResponse(c, "box updated", nil)
 }
