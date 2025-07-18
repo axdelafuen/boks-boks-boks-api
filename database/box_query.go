@@ -24,3 +24,13 @@ func SelectBoxes(db *gorm.DB, userID string) ([]model.Box, error) {
 func InsertBox(db *gorm.DB, box *model.Box) error {
 	return db.Create(box).Error
 }
+
+func CheckBoxExist(db *gorm.DB, userID, boxID string) ([]string, error) {
+	var boxIds []string
+
+	if err := db.Table("users_tables").Where("userid = ?", userID).Where("boxid = ?", boxID).Select("tableid").Find(&boxIds).Error; err != nil {
+		return nil, err
+	}
+
+	return boxIds, nil
+}
