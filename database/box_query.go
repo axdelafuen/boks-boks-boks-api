@@ -32,7 +32,7 @@ func InsertBox(db *gorm.DB, box *model.Box) error {
 func CheckBoxExist(db *gorm.DB, userID, boxID string) ([]string, error) {
 	var boxIds []string
 
-	if err := db.Table("users_tables").Where("userid = ?", userID).Where("boxid = ?", boxID).Select("tableid").Find(&boxIds).Error; err != nil {
+	if err := db.Table("users_boxes").Where("userid = ?", userID).Where("boxid = ?", boxID).Select("boxid").Find(&boxIds).Error; err != nil {
 		return nil, err
 	}
 
