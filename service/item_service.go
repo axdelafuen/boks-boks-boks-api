@@ -7,6 +7,7 @@ import (
 
 	"main/database"
 	"main/dto"
+	"main/model"
 )
 
 type ItemService struct {
@@ -38,10 +39,54 @@ func (s *ItemService) GetItems(userID string, boxID string) (*[]dto.ItemResponse
 
 	for _, item := range *items {
 		res = append(res, dto.ItemResponse{
-			Id:    item.Id.String(),
-			Title: item.Title,
+			Id:     item.Id.String(),
+			Title:  item.Title,
+			Amount: item.Amount,
 		})
 	}
 
 	return &res, nil
+}
+
+func (s *ItemService) CreateItem(userID string, boxID string, req *dto.CreateItemRequest) (*dto.ItemResponse, error) {
+	boxIdDb, err := database.CheckBoxExist(s.db, userID, boxID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to verify box ownership: %w", err)
+	}
+
+	if len(boxIdDb) == 0 {
+		return nil, fmt.Errorf("box not found or access denied")
+	}
+
+	newItem := model.InitItem(req.Title, req.Amount)
+
+	tx := s.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := database.InsertItem(tx, newItem); err != nil {
+		tx.Rollback()
+		return nil, fmt.Errorf("failed to create item: %w", err)
+	}
+
+	if err := database.InsertLinkBoxItem(tx, boxIdDb[0], newItem.Id.String()); err != nil {
+		tx.Rollback()
+		return nil, fmt.Errorf("failed to link item to box: %w", err)
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return nil, fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	// Convert to DTO format before returning
+	itemResponse := &dto.ItemResponse{
+		Id:     newItem.Id.String(),
+		Title:  newItem.Title,
+		Amount: newItem.Amount,
+	}
+
+	return itemResponse, nil
 }

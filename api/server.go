@@ -74,6 +74,7 @@ func (s *Server) setupRoutes() {
 		api.GET("/boxes", s.boxHandler.GetBoxes)
 		api.POST("/boxes", s.boxHandler.CreateBox)
 		api.GET("/boxes/:id/items", s.itemHandler.GetItems)
+		api.POST("/boxes/:id/items", s.itemHandler.CreateItem)
 	}
 }
 

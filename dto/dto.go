@@ -19,6 +19,12 @@ type CreateBoxRequest struct {
 }
 
 type ItemResponse struct {
-	Id    string `json:"id"`
-	Title string `json:"title"`
+	Id     string `json:"id"`
+	Title  string `json:"title"`
+	Amount int    `json:"amount"`
+}
+
+type CreateItemRequest struct {
+	Title  string `json:"title" binding:"required,min=1,max=100"`
+	Amount int    `json:"amount" binding:"required,min=1"`
 }

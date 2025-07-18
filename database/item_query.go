@@ -20,3 +20,7 @@ func SelectItems(db *gorm.DB, boxID string) (*[]model.Item, error) {
 
 	return &items, nil
 }
+
+func InsertItem(db *gorm.DB, item *model.Item) error {
+	return db.Create(item).Error
+}
