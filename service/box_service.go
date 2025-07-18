@@ -64,3 +64,48 @@ func (s *BoxService) CreateBox(userID uuid.UUID, req *dto.CreateBoxRequest) (*mo
 
 	return newBox, nil
 }
+
+func (s *BoxService) DeleteBox(userID uuid.UUID, boxID string) error {
+	boxesID, err := database.CheckBoxExist(s.db, userID.String(), boxID)
+	if err != nil {
+		return fmt.Errorf("failed to fetch data: %w", err)
+	}
+
+	if len(boxesID) == 0 {
+		return fmt.Errorf("box %s is not related to user %s", userID.String(), boxID)
+	}
+
+	tx := s.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := database.DeleteUserBoxLink(tx, userID.String(), boxID); err != nil {
+		return fmt.Errorf("error while deleting user<->box link: %w", err)
+	}
+
+	items, err := database.SelectItems(tx, boxID)
+	if err != nil {
+		return fmt.Errorf("can't fecth datas: %w", err)
+	}
+
+	if len(*items) != 0 {
+		for _, item := range *items {
+			if err := database.DeleteBoxItemLink(tx, boxID, item.Id.String()); err != nil {
+				return fmt.Errorf("error while deleting box<->item link: %w", err)
+			}
+		}
+	}
+
+	if err := database.DeleteBox(tx, boxID); err != nil {
+		return fmt.Errorf("error while deleting box: %w", err)
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	return nil
+}

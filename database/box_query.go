@@ -15,7 +15,7 @@ func SelectBoxes(db *gorm.DB, userID string) ([]model.Box, error) {
 	}
 
 	if len(boxesID) == 0 {
-		return boxes, nil 
+		return boxes, nil
 	}
 
 	if err := db.Where("id IN ?", boxesID).Find(&boxes).Error; err != nil {
@@ -37,4 +37,8 @@ func CheckBoxExist(db *gorm.DB, userID, boxID string) ([]string, error) {
 	}
 
 	return boxIds, nil
+}
+
+func DeleteBox(db *gorm.DB, boxID string) error {
+	return db.Where("id = ?", boxID).Delete(&model.Box{}).Error
 }

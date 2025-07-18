@@ -6,8 +6,8 @@ import (
 
 type Box struct {
 	Id    uuid.UUID `gorm:"primaryKey; not null" json:"id"`
-	Title string 	`gorm:"not null" json:"title"`
-	Items []Item `gorm:"-" json:"items"`
+	Title string    `gorm:"not null" json:"title"`
+	Items []Item    `gorm:"-" json:"items"`
 }
 
 func InitBox(title string) *Box {

@@ -55,3 +55,20 @@ func (h *BoxHandler) CreateBox(c *gin.Context) {
 
 	response.CreatedResponse(c, "box successfully created", box)
 }
+
+func (h *BoxHandler) DeleteBox(c *gin.Context) {
+	userID, err := middleware.GetUserIDFromContext(c)
+	if err != nil {
+		response.BadRequestError(c, err.Error())
+		return
+	}
+
+	boxID := c.Param("id")
+
+	if err := h.boxService.DeleteBox(userID, boxID); err != nil {
+		response.InternalServerError(c, err.Error())
+		return
+	}
+
+	response.OKResponse(c, "box and related items deleted", nil)
+}
