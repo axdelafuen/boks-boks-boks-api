@@ -99,6 +99,10 @@ func (s *BoxService) DeleteBox(userID uuid.UUID, boxID string) error {
 		}
 	}
 
+	if err := database.DeleteItems(tx, items); err != nil {
+		return fmt.Errorf("error while deleting item")
+	}
+
 	if err := database.DeleteBox(tx, boxID); err != nil {
 		return fmt.Errorf("error while deleting box: %w", err)
 	}

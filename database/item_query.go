@@ -24,3 +24,17 @@ func SelectItems(db *gorm.DB, boxID string) (*[]model.Item, error) {
 func InsertItem(db *gorm.DB, item *model.Item) error {
 	return db.Create(item).Error
 }
+
+func DeleteItem(db *gorm.DB, item *model.Item) error {
+	return db.Where("id = ?", item.Id.String()).Delete(&model.Item{}).Error
+}
+
+func DeleteItems(db *gorm.DB, items *[]model.Item) error {
+	for _, item := range *items {
+		if err := DeleteItem(db, &item); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
