@@ -90,3 +90,42 @@ func (s *ItemService) CreateItem(userID string, boxID string, req *dto.CreateIte
 
 	return itemResponse, nil
 }
+
+func (s *ItemService) DeleteItem(userId, boxId, itemId string) error {
+	boxIdDb, err := database.CheckBoxExist(s.db, userId, boxId)
+	if err != nil {
+		return fmt.Errorf("failed to verify box ownership: %w", err)
+	}
+
+	if len(boxIdDb) == 0 {
+		return fmt.Errorf("box not found or access denied")
+	}
+
+	itemIdDb, err := database.CheckBoxOwnItem(s.db, boxId, itemId)
+	if err != nil {
+		return fmt.Errorf("failed to verify item ownership: %w", err)
+	}
+
+	if len(itemIdDb) == 0 {
+		return fmt.Errorf("item not found or access denied")
+	}
+
+	tx := s.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := database.DeleteBoxItemLink(tx, boxId, itemId); err != nil {
+		tx.Rollback()
+		return fmt.Errorf("fail while deleting bow<->item link: %w", err)
+	}
+
+	if err := database.DeleteItemWithId(tx, itemId); err != nil {
+		tx.Rollback()
+		return fmt.Errorf("fail while deleting item: %w", err)
+	}
+
+	return nil
+}

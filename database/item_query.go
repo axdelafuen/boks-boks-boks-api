@@ -38,3 +38,7 @@ func DeleteItems(db *gorm.DB, items *[]model.Item) error {
 
 	return nil
 }
+
+func DeleteItemWithId(db *gorm.DB, itemId string) error {
+	return db.Where("id = ?", itemId).Delete(&model.Item{}).Error
+}

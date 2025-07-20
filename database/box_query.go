@@ -46,3 +46,13 @@ func DeleteBox(db *gorm.DB, id string) error {
 func UpdateBox(db *gorm.DB, id, title string) error {
 	return db.Model(&model.Box{}).Where("id = ?", id).UpdateColumn("title", title).Error
 }
+
+func CheckBoxOwnItem(db *gorm.DB, boxId, itemId string) ([]string, error) {
+	var itemIds []string
+
+	if err := db.Table("boxes_items").Where("boxid = ?", boxId).Where("itemid = ?", itemId).Find(&itemIds).Error; err != nil {
+		return nil, err
+	}
+
+	return itemIds, nil
+}

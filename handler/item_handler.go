@@ -60,3 +60,20 @@ func (h *ItemHandler) CreateItem(c *gin.Context) {
 
 	response.SuccessResponse(c, 201, "item created successfully", item)
 }
+
+func (h *ItemHandler) DeleteItem(c *gin.Context) {
+	userID, err := middleware.GetUserIDFromContext(c)
+	if err != nil {
+		response.BadRequestError(c, err.Error())
+		return
+	}
+
+	boxID := c.Param("id")
+	itemID := c.Param("itemid")
+	if err := h.itemService.DeleteItem(userID.String(), boxID, itemID); err != nil {
+		response.InternalServerError(c, err.Error())
+		return
+	}
+
+	response.SuccessResponse(c, 201, "item deleted", nil)
+}

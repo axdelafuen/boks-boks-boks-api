@@ -78,6 +78,8 @@ func (s *Server) setupRoutes() {
 
 		api.GET("/boxes/:id/items", s.itemHandler.GetItems)
 		api.POST("/boxes/:id/items", s.itemHandler.CreateItem)
+
+		api.DELETE("/boxes/:id/items/:itemid", s.itemHandler.DeleteItem)
 	}
 }
 
