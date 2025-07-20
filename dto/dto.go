@@ -33,3 +33,9 @@ type UpdateBoxRequest struct {
 	Id    string `json:"id"`
 	Title string `json:"title"`
 }
+
+type UpdateItemRequest struct {
+	Id     string `json:"id"`
+	Title  string `json:"title"`
+	Amount int    `json:"amount"`
+}

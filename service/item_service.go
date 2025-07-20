@@ -133,3 +133,41 @@ func (s *ItemService) DeleteItem(userId, boxId, itemId string) error {
 
 	return nil
 }
+
+func (s *ItemService) UpdateItem(userId, boxId string, req *dto.UpdateItemRequest) error {
+	boxIdDb, err := database.CheckBoxExist(s.db, userId, boxId)
+	if err != nil {
+		return fmt.Errorf("failed to verify box ownership: %w", err)
+	}
+
+	if len(boxIdDb) == 0 {
+		return fmt.Errorf("box not found or access denied: %w", err)
+	}
+
+	itemIdDb, err := database.CheckBoxOwnItem(s.db, boxId, req.Id)
+	if err != nil {
+		return fmt.Errorf("failed to verify item ownership: %w", err)
+	}
+
+	if len(itemIdDb) == 0 {
+		return fmt.Errorf("item not found or access denied")
+	}
+
+	tx := s.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := database.UpdateItem(tx, req.Id, req.Title, req.Amount); err != nil {
+		tx.Rollback()
+		return fmt.Errorf("error while updating item")
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	return nil
+}

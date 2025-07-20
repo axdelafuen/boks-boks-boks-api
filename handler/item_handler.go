@@ -77,3 +77,25 @@ func (h *ItemHandler) DeleteItem(c *gin.Context) {
 
 	response.SuccessResponse(c, 201, "item deleted", nil)
 }
+
+func (h *ItemHandler) UpdateItem(c *gin.Context) {
+	userID, err := middleware.GetUserIDFromContext(c)
+	if err != nil {
+		response.BadRequestError(c, err.Error())
+		return
+	}
+
+	boxID := c.Param("id")
+
+	var req dto.UpdateItemRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.BadRequestError(c, err.Error())
+	}
+
+	if err := h.itemService.UpdateItem(userID.String(), boxID, &req); err != nil {
+		response.InternalServerError(c, err.Error())
+		return
+	}
+
+	response.SuccessResponse(c, 201, "item updated", nil)
+}

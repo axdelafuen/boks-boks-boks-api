@@ -42,3 +42,7 @@ func DeleteItems(db *gorm.DB, items *[]model.Item) error {
 func DeleteItemWithId(db *gorm.DB, itemId string) error {
 	return db.Where("id = ?", itemId).Delete(&model.Item{}).Error
 }
+
+func UpdateItem(db *gorm.DB, id, title string, amount int) error {
+	return db.Model(&model.Item{}).Where("id = ?", id).Updates(map[string]interface{}{"title": title, "amount": amount}).Error
+}

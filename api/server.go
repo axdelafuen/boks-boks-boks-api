@@ -80,6 +80,7 @@ func (s *Server) setupRoutes() {
 		api.POST("/boxes/:id/items", s.itemHandler.CreateItem)
 
 		api.DELETE("/boxes/:id/items/:itemid", s.itemHandler.DeleteItem)
+		api.PUT("/boxes/:id/items", s.itemHandler.UpdateItem)
 	}
 }
 
