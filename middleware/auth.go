@@ -84,7 +84,7 @@ func GetUserIDFromContext(c *gin.Context) (uuid.UUID, error) {
 func GenerateJWT(userID uuid.UUID, jwtSecret string) (string, error) {
 	claims := jwt.MapClaims{
 		"sub": userID.String(),
-		"exp": time.Now().Add(24 * time.Hour).Unix(),
+		"exp": time.Now().Add(1 * time.Hour).Unix(),
 		"iat": time.Now().Unix(),
 	}
 
