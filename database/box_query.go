@@ -50,7 +50,7 @@ func UpdateBox(db *gorm.DB, id, title string) error {
 func CheckBoxOwnItem(db *gorm.DB, boxId, itemId string) ([]string, error) {
 	var itemIds []string
 
-	if err := db.Table("boxes_items").Where("boxid = ?", boxId).Where("itemid = ?", itemId).Find(&itemIds).Error; err != nil {
+	if err := db.Table("boxes_items").Select("itemid").Where("boxid = ?", boxId).Where("itemid = ?", itemId).Find(&itemIds).Error; err != nil {
 		return nil, err
 	}
 

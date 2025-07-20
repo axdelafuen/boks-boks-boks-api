@@ -127,5 +127,9 @@ func (s *ItemService) DeleteItem(userId, boxId, itemId string) error {
 		return fmt.Errorf("fail while deleting item: %w", err)
 	}
 
+	if err := tx.Commit().Error; err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
 	return nil
 }
