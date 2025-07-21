@@ -56,3 +56,22 @@ func (h *LabelHandler) GetLabel(c *gin.Context) {
 
 	response.SuccessResponse(c, 201, "Labels fetched", labels)
 }
+
+func (h *LabelHandler) AddLabelToItem(c *gin.Context) {
+	userId, err := middleware.GetUserIDFromContext(c)
+	if err != nil {
+		response.BadRequestError(c, err.Error())
+		return
+	}
+
+	boxId := c.Param("id")
+	itemId := c.Param("itemid")
+	labelId := c.Param("labelid")
+
+	if err := h.labelService.AddLabelToItem(userId.String(), boxId, itemId, labelId); err != nil {
+		response.InternalServerError(c, err.Error())
+		return
+	}
+
+	response.SuccessResponse(c, 201, "Label added to item", nil)
+}

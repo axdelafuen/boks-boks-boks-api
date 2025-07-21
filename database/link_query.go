@@ -32,3 +32,10 @@ func InsertLinkUserLabel(db *gorm.DB, userId, labelId string) error {
 		"labelid": labelId,
 	}).Error
 }
+
+func InsertLinkItemLabel(db *gorm.DB, itemId, labelId string) error {
+	return db.Table("items_labels").Create(map[string]interface{}{
+		"itemid":  itemId,
+		"labelid": labelId,
+	}).Error
+}

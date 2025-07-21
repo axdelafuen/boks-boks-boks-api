@@ -62,3 +62,41 @@ func (s *LabelService) GetLabels(userId string) (*[]dto.LabelResponse, error) {
 
 	return &res, nil
 }
+
+func (s *LabelService) AddLabelToItem(userId, boxId, itemId, labelId string) error {
+	boxesID, err := database.CheckBoxExist(s.db, userId, boxId)
+	if err != nil {
+		return fmt.Errorf("failed to fetch data: %w", err)
+	}
+
+	if len(boxesID) == 0 {
+		return fmt.Errorf("box %s is not related to user %s", userId, boxId)
+	}
+
+	labelsID, err := database.CheckUserOwnLabel(s.db, userId, labelId)
+	if err != nil {
+		return fmt.Errorf("failed to fetch data: %w", err)
+	}
+
+	if len(labelsID) == 0 {
+		return fmt.Errorf("user %s can't access label %s", userId, labelId)
+	}
+
+	tx := s.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := database.InsertLinkItemLabel(tx, itemId, labelId); err != nil {
+		tx.Rollback()
+		return fmt.Errorf("error while inserting: %w", err)
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	return nil
+}
