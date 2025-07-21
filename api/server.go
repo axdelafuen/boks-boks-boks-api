@@ -14,12 +14,13 @@ import (
 )
 
 type Server struct {
-	router      *gin.Engine
-	dbManager   *database.Manager
-	jwtSecret   string
-	authHandler *handler.AuthHandler
-	boxHandler  *handler.BoxHandler
-	itemHandler *handler.ItemHandler
+	router       *gin.Engine
+	dbManager    *database.Manager
+	jwtSecret    string
+	authHandler  *handler.AuthHandler
+	boxHandler   *handler.BoxHandler
+	itemHandler  *handler.ItemHandler
+	labelHandler *handler.LabelHandler
 }
 
 func NewServer() (*Server, error) {
@@ -36,18 +37,21 @@ func NewServer() (*Server, error) {
 	authService := service.NewAuthService(dbManager.GetDB(), jwtSecret)
 	boxService := service.NewBoxService(dbManager.GetDB())
 	itemService := service.NewItemService(dbManager.GetDB())
+	labelService := service.NewLabelService(dbManager.GetDB())
 
 	authHandler := handler.NewAuthHandler(authService)
 	boxHandler := handler.NewBoxHandler(boxService)
 	itemHandler := handler.NewItemHandler(itemService)
+	labelHandler := handler.NewLabelHandler(labelService)
 
 	server := &Server{
-		router:      gin.Default(),
-		dbManager:   dbManager,
-		jwtSecret:   jwtSecret,
-		authHandler: authHandler,
-		boxHandler:  boxHandler,
-		itemHandler: itemHandler,
+		router:       gin.Default(),
+		dbManager:    dbManager,
+		jwtSecret:    jwtSecret,
+		authHandler:  authHandler,
+		boxHandler:   boxHandler,
+		itemHandler:  itemHandler,
+		labelHandler: labelHandler,
 	}
 
 	// Configure CORS middleware
@@ -78,9 +82,10 @@ func (s *Server) setupRoutes() {
 
 		api.GET("/boxes/:id/items", s.itemHandler.GetItems)
 		api.POST("/boxes/:id/items", s.itemHandler.CreateItem)
-
 		api.DELETE("/boxes/:id/items/:itemid", s.itemHandler.DeleteItem)
 		api.PUT("/boxes/:id/items", s.itemHandler.UpdateItem)
+
+		api.POST("/labels", s.labelHandler.CreateLabel)
 	}
 }
 

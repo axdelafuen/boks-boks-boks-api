@@ -25,3 +25,10 @@ func DeleteUserBoxLink(db *gorm.DB, userID, boxID string) error {
 func DeleteBoxItemLink(db *gorm.DB, boxID, itemID string) error {
 	return db.Table("boxes_items").Where("boxid = ?", boxID).Where("itemid = ?", itemID).Delete(nil).Error
 }
+
+func InsertLinkUserLabel(db *gorm.DB, userId, labelId string) error {
+	return db.Table("users_labels").Create(map[string]interface{}{
+		"userid":  userId,
+		"labelid": labelId,
+	}).Error
+}

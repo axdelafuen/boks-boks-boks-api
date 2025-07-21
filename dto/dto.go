@@ -39,3 +39,8 @@ type UpdateItemRequest struct {
 	Title  string `json:"title"`
 	Amount int    `json:"amount"`
 }
+
+type CreateLabelRequest struct {
+	Title string `json:"title"`
+	Color string `json:"color"`
+}
