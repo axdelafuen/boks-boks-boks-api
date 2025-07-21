@@ -14,6 +14,12 @@ type BoxResponse struct {
 	Title string `json:"title"`
 }
 
+type LabelResponse struct {
+	Id    string `json:"id"`
+	Title string `json:"title"`
+	Color string `json:"color"`
+}
+
 type CreateBoxRequest struct {
 	Title string `json:"title" binding:"required,min=1,max=100"`
 }

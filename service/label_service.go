@@ -44,3 +44,21 @@ func (s *LabelService) CreateLabel(userId string, req *dto.CreateLabelRequest) (
 
 	return newLabel, nil
 }
+
+func (s *LabelService) GetLabels(userId string) (*[]dto.LabelResponse, error) {
+	var res []dto.LabelResponse
+	labels, err := database.SelectLabels(s.db, userId)
+	if err != nil {
+		return nil, fmt.Errorf("can't fetch data from db: %w", err)
+	}
+
+	for _, label := range labels {
+		res = append(res, dto.LabelResponse{
+			Id:    label.Id.String(),
+			Title: label.Title,
+			Color: label.Color,
+		})
+	}
+
+	return &res, nil
+}
