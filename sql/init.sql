@@ -15,6 +15,12 @@ CREATE TABLE IF NOT EXISTS items (
   amount int
 );
 
+CREATE TABLE IF NOT EXISTS labels (
+  id varchar PRIMARY KEY,
+  title varchar,
+  color varchar
+);
+
 CREATE TABLE IF NOT EXISTS boxes_items (
   boxid varchar,
   itemid varchar,
@@ -31,4 +37,22 @@ CREATE TABLE IF NOT EXISTS users_boxes (
   CONSTRAINT pk_users_boxes PRIMARY KEY(userid, boxid),
   FOREIGN KEY (userid) REFERENCES users(id),
   FOREIGN KEY (boxid) REFERENCES boxes(id)
+);
+
+CREATE TABLE IF NOT EXISTS users_labels (
+  userid varchar,
+  labelid varchar,
+
+  CONSTRAINT pk_users_labels PRIMARY KEY(userid, labelid),
+  FOREIGN KEY (userid) REFERENCES users(id),
+  FOREIGN KEY (labelid) REFERENCES labels(id)
+);
+
+CREATE TABLE IF NOT EXISTS items_labels (
+  itemid varchar,
+  labelid varchar,
+
+  CONSTRAINT pk_items_labels PRIMARY KEY(itemid, labelid),
+  FOREIGN KEY (itemid) REFERENCES items(id),
+  FOREIGN KEY (labelid) REFERENCES labels(id)
 );
