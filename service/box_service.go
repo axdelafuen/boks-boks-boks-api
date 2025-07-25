@@ -96,6 +96,10 @@ func (s *BoxService) DeleteBox(userID uuid.UUID, boxID string) error {
 			if err := database.DeleteBoxItemLink(tx, boxID, item.Id.String()); err != nil {
 				return fmt.Errorf("error while deleting box<->item link: %w", err)
 			}
+			if err := database.DeleteItemLabelsLink(tx, item.Id.String()); err != nil {
+				tx.Rollback()
+				return fmt.Errorf("fail while deleting item<->label link: %w", err)
+			}
 		}
 	}
 

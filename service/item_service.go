@@ -125,7 +125,12 @@ func (s *ItemService) DeleteItem(userId, boxId, itemId string) error {
 
 	if err := database.DeleteBoxItemLink(tx, boxId, itemId); err != nil {
 		tx.Rollback()
-		return fmt.Errorf("fail while deleting bow<->item link: %w", err)
+		return fmt.Errorf("fail while deleting box<->item link: %w", err)
+	}
+
+	if err := database.DeleteItemLabelsLink(tx, itemId); err != nil {
+		tx.Rollback()
+		return fmt.Errorf("fail while deleting item<->label link: %w", err)
 	}
 
 	if err := database.DeleteItemWithId(tx, itemId); err != nil {

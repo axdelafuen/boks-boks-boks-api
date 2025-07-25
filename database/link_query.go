@@ -39,3 +39,7 @@ func InsertLinkItemLabel(db *gorm.DB, itemId, labelId string) error {
 		"labelid": labelId,
 	}).Error
 }
+
+func DeleteItemLabelsLink(db *gorm.DB, itemId string) error {
+	return db.Table("items_labels").Where("itemid = ?", itemId).Delete(nil).Error
+}
