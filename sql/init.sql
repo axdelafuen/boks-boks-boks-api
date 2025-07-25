@@ -18,7 +18,8 @@ CREATE TABLE IF NOT EXISTS items (
 CREATE TABLE IF NOT EXISTS labels (
   id varchar PRIMARY KEY,
   title varchar,
-  color varchar
+  color varchar,
+  description varchar
 );
 
 CREATE TABLE IF NOT EXISTS boxes_items (

@@ -5,9 +5,10 @@ import (
 )
 
 type Label struct {
-	Id    uuid.UUID
-	Title string
-	Color string
+	Id          uuid.UUID
+	Title       string
+	Color       string
+	Description string
 }
 
 func InitLabel(title, color string) *Label {
