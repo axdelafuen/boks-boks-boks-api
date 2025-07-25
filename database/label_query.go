@@ -1,6 +1,7 @@
 package database
 
 import (
+	"main/dto"
 	"main/model"
 
 	"gorm.io/gorm"
@@ -27,4 +28,28 @@ func SelectLabels(db *gorm.DB, userId string) ([]model.Label, error) {
 	}
 
 	return labels, nil
+}
+
+func SelectItemsLabels(db *gorm.DB, itemId string) (*[]dto.LabelResponse, error) {
+	var labels []model.Label
+	var labelsId []string
+	var res []dto.LabelResponse
+
+	if err := db.Table("items_labels").Where("itemid = ?", itemId).Select("labelid").Find(&labelsId).Error; err != nil {
+		return nil, err
+	}
+
+	if err := db.Where("id IN ?", labelsId).Find(&labels).Error; err != nil {
+		return nil, err
+	}
+
+	for _, l := range labels {
+		res = append(res, dto.LabelResponse{
+			Id:    l.Id.String(),
+			Title: l.Title,
+			Color: l.Color,
+		})
+	}
+
+	return &res, nil
 }

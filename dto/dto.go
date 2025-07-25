@@ -25,9 +25,10 @@ type CreateBoxRequest struct {
 }
 
 type ItemResponse struct {
-	Id     string `json:"id"`
-	Title  string `json:"title"`
-	Amount int    `json:"amount"`
+	Id     string          `json:"id"`
+	Title  string          `json:"title"`
+	Amount int             `json:"amount"`
+	Labels []LabelResponse `json:"labels"`
 }
 
 type CreateItemRequest struct {

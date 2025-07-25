@@ -38,10 +38,16 @@ func (s *ItemService) GetItems(userID string, boxID string) (*[]dto.ItemResponse
 	}
 
 	for _, item := range *items {
+		// get labels for each item
+		labels, err := database.SelectItemsLabels(s.db, item.Id.String())
+		if err != nil {
+			return nil, fmt.Errorf("failed to fetch labels: %w", err.Error())
+		}
 		res = append(res, dto.ItemResponse{
 			Id:     item.Id.String(),
 			Title:  item.Title,
 			Amount: item.Amount,
+			Labels: *labels,
 		})
 	}
 
