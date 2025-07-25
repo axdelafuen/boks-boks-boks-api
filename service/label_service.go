@@ -21,7 +21,7 @@ func NewLabelService(db *gorm.DB) *LabelService {
 }
 
 func (s *LabelService) CreateLabel(userId string, req *dto.CreateLabelRequest) (*model.Label, error) {
-	newLabel := model.InitLabel(req.Title, req.Color)
+	newLabel := model.InitLabel(req.Title, req.Color, req.Description)
 
 	tx := s.db.Begin()
 	defer func() {
@@ -54,9 +54,10 @@ func (s *LabelService) GetLabels(userId string) (*[]dto.LabelResponse, error) {
 
 	for _, label := range labels {
 		res = append(res, dto.LabelResponse{
-			Id:    label.Id.String(),
-			Title: label.Title,
-			Color: label.Color,
+			Id:          label.Id.String(),
+			Title:       label.Title,
+			Color:       label.Color,
+			Description: label.Description,
 		})
 	}
 

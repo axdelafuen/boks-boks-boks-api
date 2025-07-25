@@ -15,9 +15,10 @@ type BoxResponse struct {
 }
 
 type LabelResponse struct {
-	Id    string `json:"id"`
-	Title string `json:"title"`
-	Color string `json:"color"`
+	Id          string `json:"id"`
+	Title       string `json:"title"`
+	Color       string `json:"color"`
+	Description string `json:"description"`
 }
 
 type CreateBoxRequest struct {
@@ -48,6 +49,7 @@ type UpdateItemRequest struct {
 }
 
 type CreateLabelRequest struct {
-	Title string `json:"title"`
-	Color string `json:"color"`
+	Title       string `json:"title"`
+	Color       string `json:"color"`
+	Description string `json:"description"`
 }

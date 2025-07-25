@@ -11,6 +11,6 @@ type Label struct {
 	Description string
 }
 
-func InitLabel(title, color string) *Label {
-	return &Label{Id: uuid.New(), Title: title, Color: color}
+func InitLabel(title, color, description string) *Label {
+	return &Label{Id: uuid.New(), Title: title, Color: color, Description: description}
 }
