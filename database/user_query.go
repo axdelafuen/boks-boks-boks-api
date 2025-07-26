@@ -30,3 +30,13 @@ func CheckUserOwnLabel(db *gorm.DB, userId, labelId string) ([]string, error) {
 
 	return labelsID, nil
 }
+
+func CheckUserOwnItem(db *gorm.DB, userId, itemId string) ([]string, error) {
+	var itemsId []string
+
+	if err := db.Table("boxes_items").Select("boxes_items.itemid").Joins("JOIN users_boxes ON users_boxes.boxid = boxes_items.boxid").Where("users_boxes.userid = ? AND boxes_items.itemid = ?", userId, itemId).Scan(&itemsId).Error; err != nil {
+		return nil, err
+	}
+
+	return itemsId, nil
+}

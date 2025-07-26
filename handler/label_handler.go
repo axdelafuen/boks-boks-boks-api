@@ -64,11 +64,10 @@ func (h *LabelHandler) AddLabelToItem(c *gin.Context) {
 		return
 	}
 
-	boxId := c.Param("id")
 	itemId := c.Param("itemid")
 	labelId := c.Param("labelid")
 
-	if err := h.labelService.AddLabelToItem(userId.String(), boxId, itemId, labelId); err != nil {
+	if err := h.labelService.AddLabelToItem(userId.String(), itemId, labelId); err != nil {
 		response.InternalServerError(c, err.Error())
 		return
 	}

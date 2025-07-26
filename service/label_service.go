@@ -64,14 +64,14 @@ func (s *LabelService) GetLabels(userId string) (*[]dto.LabelResponse, error) {
 	return &res, nil
 }
 
-func (s *LabelService) AddLabelToItem(userId, boxId, itemId, labelId string) error {
-	boxesID, err := database.CheckBoxExist(s.db, userId, boxId)
+func (s *LabelService) AddLabelToItem(userId, itemId, labelId string) error {
+	itemsId, err := database.CheckUserOwnItem(s.db, userId, itemId)
 	if err != nil {
 		return fmt.Errorf("failed to fetch data: %w", err)
 	}
 
-	if len(boxesID) == 0 {
-		return fmt.Errorf("box %s is not related to user %s", userId, boxId)
+	if len(itemsId) == 0 {
+		return fmt.Errorf("item %s is not related to user %s", itemId, userId)
 	}
 
 	labelsID, err := database.CheckUserOwnLabel(s.db, userId, labelId)
