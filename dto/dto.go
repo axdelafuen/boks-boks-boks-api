@@ -33,8 +33,9 @@ type ItemResponse struct {
 }
 
 type CreateItemRequest struct {
-	Title  string `json:"title" binding:"required,min=1,max=100"`
-	Amount int    `json:"amount" binding:"required,min=1"`
+	Title  string          `json:"title" binding:"required,min=1,max=100"`
+	Amount int             `json:"amount" binding:"required,min=1"`
+	Labels []LabelResponse `json:"labels"`
 }
 
 type UpdateBoxRequest struct {

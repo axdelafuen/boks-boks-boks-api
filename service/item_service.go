@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 
+	uuid "github.com/google/uuid"
 	"gorm.io/gorm"
 
 	"main/database"
@@ -43,6 +44,7 @@ func (s *ItemService) GetItems(userID string, boxID string) (*[]dto.ItemResponse
 		if err != nil {
 			return nil, fmt.Errorf("failed to fetch labels: %w", err.Error())
 		}
+
 		res = append(res, dto.ItemResponse{
 			Id:     item.Id.String(),
 			Title:  item.Title,
@@ -64,7 +66,20 @@ func (s *ItemService) CreateItem(userID string, boxID string, req *dto.CreateIte
 		return nil, fmt.Errorf("box not found or access denied")
 	}
 
-	newItem := model.InitItem(req.Title, req.Amount)
+	var labels []model.Label
+	for _, label := range req.Labels {
+		id, err := uuid.Parse(label.Id)
+		if err != nil {
+			return nil, fmt.Errorf("Error while parsing label id: %w", err)
+		}
+		labels = append(labels, model.Label{
+			Id:          id,
+			Title:       label.Title,
+			Description: label.Description,
+			Color:       label.Color,
+		})
+	}
+	newItem := model.InitItemWithLabels(req.Title, req.Amount, labels)
 
 	tx := s.db.Begin()
 	defer func() {
@@ -78,6 +93,12 @@ func (s *ItemService) CreateItem(userID string, boxID string, req *dto.CreateIte
 		return nil, fmt.Errorf("failed to create item: %w", err)
 	}
 
+	for _, label := range req.Labels {
+		if err := database.InsertLinkItemLabel(tx, newItem.Id.String(), label.Id); err != nil {
+			return nil, fmt.Errorf("failed to link label to label: %w", err)
+		}
+	}
+
 	if err := database.InsertLinkBoxItem(tx, boxIdDb[0], newItem.Id.String()); err != nil {
 		tx.Rollback()
 		return nil, fmt.Errorf("failed to link item to box: %w", err)
@@ -87,11 +108,21 @@ func (s *ItemService) CreateItem(userID string, boxID string, req *dto.CreateIte
 		return nil, fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
-	// Convert to DTO format before returning
+	var labelsDto []dto.LabelResponse
+	for _, l := range newItem.Labels {
+		labelsDto = append(labelsDto, dto.LabelResponse{
+			Id:          l.Id.String(),
+			Title:       l.Title,
+			Description: l.Description,
+			Color:       l.Color,
+		})
+	}
+
 	itemResponse := &dto.ItemResponse{
 		Id:     newItem.Id.String(),
 		Title:  newItem.Title,
 		Amount: newItem.Amount,
+		Labels: labelsDto,
 	}
 
 	return itemResponse, nil
