@@ -88,6 +88,7 @@ func (s *Server) setupRoutes() {
 		api.POST("/items/:itemid/labels/:labelid", s.labelHandler.AddLabelToItem)
 		api.GET("/labels", s.labelHandler.GetLabel)
 		api.POST("/labels", s.labelHandler.CreateLabel)
+		api.DELETE("/labels/:id", s.labelHandler.DeleteLabel)
 	}
 }
 

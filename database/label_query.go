@@ -53,3 +53,7 @@ func SelectItemsLabels(db *gorm.DB, itemId string) (*[]dto.LabelResponse, error)
 
 	return &res, nil
 }
+
+func DeleteLabel(db *gorm.DB, labelId string) error {
+	return db.Where("id = ?", labelId).Delete(&model.Label{}).Error
+}

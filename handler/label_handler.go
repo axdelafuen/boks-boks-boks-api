@@ -74,3 +74,20 @@ func (h *LabelHandler) AddLabelToItem(c *gin.Context) {
 
 	response.SuccessResponse(c, 201, "Label added to item", nil)
 }
+
+func (h *LabelHandler) DeleteLabel(c *gin.Context) {
+	userId, err := middleware.GetUserIDFromContext(c)
+	if err != nil {
+		response.BadRequestError(c, err.Error())
+		return
+	}
+
+	labelId := c.Param("id")
+
+	if err := h.labelService.DeleteLabel(userId.String(), labelId); err != nil {
+		response.InternalServerError(c, err.Error())
+		return
+	}
+
+	response.SuccessResponse(c, 201, "Label deleted", nil)
+}

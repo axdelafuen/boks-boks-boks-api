@@ -101,3 +101,41 @@ func (s *LabelService) AddLabelToItem(userId, itemId, labelId string) error {
 
 	return nil
 }
+
+func (s *LabelService) DeleteLabel(userId, labelId string) error {
+	labelsId, err := database.CheckUserOwnLabel(s.db, userId, labelId)
+	if err != nil {
+		return fmt.Errorf("failed to fetch data: %w", err)
+	}
+
+	if len(labelsId) == 0 {
+		return fmt.Errorf("label %s is not related to user %d", labelId, userId)
+	}
+
+	tx := s.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := database.DeleteUserLabelLink(tx, userId, labelId); err != nil {
+		return fmt.Errorf("error while deleting: %w", err)
+	}
+
+	if err := database.DeleteItemsLabelLink(tx, labelId); err != nil {
+		return fmt.Errorf("error while deleting: %w", err)
+	}
+
+	if err := database.DeleteLabel(tx, labelId); err != nil {
+		tx.Rollback()
+		return fmt.Errorf("error while deleting: %w", err)
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	return nil
+}
