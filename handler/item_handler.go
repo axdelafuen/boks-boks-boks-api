@@ -92,10 +92,11 @@ func (h *ItemHandler) UpdateItem(c *gin.Context) {
 		response.BadRequestError(c, err.Error())
 	}
 
-	if err := h.itemService.UpdateItem(userID.String(), boxID, &req); err != nil {
+	newItem, err := h.itemService.UpdateItem(userID.String(), boxID, &req) 
+	if err != nil {
 		response.InternalServerError(c, err.Error())
 		return
 	}
 
-	response.SuccessResponse(c, 201, "item updated", nil)
+	response.SuccessResponse(c, 201, "item updated", newItem)
 }

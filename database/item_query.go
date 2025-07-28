@@ -1,6 +1,7 @@
 package database
 
 import (
+	"main/dto"
 	"main/model"
 
 	"gorm.io/gorm"
@@ -43,6 +44,32 @@ func DeleteItemWithId(db *gorm.DB, itemId string) error {
 	return db.Where("id = ?", itemId).Delete(&model.Item{}).Error
 }
 
-func UpdateItem(db *gorm.DB, id, title string, amount int) error {
-	return db.Model(&model.Item{}).Where("id = ?", id).Updates(map[string]interface{}{"title": title, "amount": amount}).Error
+func UpdateItem(db *gorm.DB, id, title string, amount int) (*dto.ItemResponse, error) {
+	if err := db.Model(&model.Item{}).Where("id = ?", id).Updates(map[string]interface{}{"title": title, "amount": amount}).Error; err != nil {
+		return nil, err
+	}
+	
+	var updatedItem model.Item
+	if err := db.Where("id = ?", id).First(&updatedItem).Error; err != nil {
+		return nil, err
+	}
+	
+	labels, err := SelectItemsLabels(db, id)
+	if err != nil {
+		return nil, err
+	}
+	
+	var labelsDto []dto.LabelResponse
+	if labels != nil {
+		labelsDto = *labels
+	}
+	
+	itemResponse := &dto.ItemResponse{
+		Id:     updatedItem.Id.String(),
+		Title:  updatedItem.Title,
+		Amount: updatedItem.Amount,
+		Labels: labelsDto,
+	}
+	
+	return itemResponse, nil
 }

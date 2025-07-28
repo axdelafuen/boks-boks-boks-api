@@ -176,23 +176,23 @@ func (s *ItemService) DeleteItem(userId, boxId, itemId string) error {
 	return nil
 }
 
-func (s *ItemService) UpdateItem(userId, boxId string, req *dto.UpdateItemRequest) error {
+func (s *ItemService) UpdateItem(userId, boxId string, req *dto.UpdateItemRequest) (*dto.ItemResponse, error) {
 	boxIdDb, err := database.CheckBoxExist(s.db, userId, boxId)
 	if err != nil {
-		return fmt.Errorf("failed to verify box ownership: %w", err)
+		return nil, fmt.Errorf("failed to verify box ownership: %w", err)
 	}
 
 	if len(boxIdDb) == 0 {
-		return fmt.Errorf("box not found or access denied: %w", err)
+		return nil, fmt.Errorf("box not found or access denied: %w", err)
 	}
 
 	itemIdDb, err := database.CheckBoxOwnItem(s.db, boxId, req.Id)
 	if err != nil {
-		return fmt.Errorf("failed to verify item ownership: %w", err)
+		return nil, fmt.Errorf("failed to verify item ownership: %w", err)
 	}
 
 	if len(itemIdDb) == 0 {
-		return fmt.Errorf("item not found or access denied")
+		return nil, fmt.Errorf("item not found or access denied")
 	}
 
 	tx := s.db.Begin()
@@ -202,14 +202,15 @@ func (s *ItemService) UpdateItem(userId, boxId string, req *dto.UpdateItemReques
 		}
 	}()
 
-	if err := database.UpdateItem(tx, req.Id, req.Title, req.Amount); err != nil {
+	newItem, err := database.UpdateItem(tx, req.Id, req.Title, req.Amount)
+	if err != nil {
 		tx.Rollback()
-		return fmt.Errorf("error while updating item")
+		return nil, fmt.Errorf("error while updating item")
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		return fmt.Errorf("failed to commit transaction: %w", err)
+		return nil, fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
-	return nil
+	return newItem, nil
 }
