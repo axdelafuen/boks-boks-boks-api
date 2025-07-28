@@ -202,7 +202,7 @@ func (s *ItemService) UpdateItem(userId, boxId string, req *dto.UpdateItemReques
 		}
 	}()
 
-	newItem, err := database.UpdateItem(tx, req.Id, req.Title, req.Amount)
+	newItem, err := database.UpdateItem(tx, req.Id, req.Title, req.Amount, req.Labels)
 	if err != nil {
 		tx.Rollback()
 		return nil, fmt.Errorf("error while updating item")

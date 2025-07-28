@@ -44,9 +44,10 @@ type UpdateBoxRequest struct {
 }
 
 type UpdateItemRequest struct {
-	Id     string `json:"id"`
-	Title  string `json:"title"`
-	Amount int    `json:"amount"`
+	Id     string          `json:"id"`
+	Title  string          `json:"title"`
+	Amount int             `json:"amount"`
+	Labels []LabelResponse `json:"labels"`
 }
 
 type CreateLabelRequest struct {

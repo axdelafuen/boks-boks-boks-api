@@ -44,32 +44,93 @@ func DeleteItemWithId(db *gorm.DB, itemId string) error {
 	return db.Where("id = ?", itemId).Delete(&model.Item{}).Error
 }
 
-func UpdateItem(db *gorm.DB, id, title string, amount int) (*dto.ItemResponse, error) {
+func UpdateItemLabelsWithNew(db *gorm.DB, itemId string, newLabels []dto.LabelResponse) error {
+	labels, err := SelectItemsLabels(db, itemId)
+	if err != nil {
+		return err
+	}
+
+	currentLabelsIds := extractIds(*labels)
+	newLabelsIds := extractIds(newLabels)
+
+	removed, toAdd := getAddRemoveLabel(currentLabelsIds, newLabelsIds)
+
+	if err := DeleteItemLabelLinks(db, itemId, removed); err != nil {
+		return err
+	}
+
+	if err := InsertItemLabelLinks(db, itemId, toAdd); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func getAddRemoveLabel(sourceId, newId []string) (removed []string, toAdd []string) {
+	srcIds := make(map[string]bool)
+	newIds := make(map[string]bool)
+
+	for _, id := range sourceId {
+		srcIds[id] = true
+	}
+
+	for _, id := range newId {
+		newIds[id] = true
+	}
+
+	for id := range srcIds {
+		if !newIds[id] {
+			removed = append(removed, id)
+		}
+	}
+
+	for id := range newIds {
+		if !srcIds[id] {
+			toAdd = append(toAdd, id)
+		}
+	}
+
+	return
+}
+
+func extractIds(labels []dto.LabelResponse) []string {
+	ids := make([]string, 0, len(labels))
+	for _, label := range labels {
+		ids = append(ids, label.Id)
+	}
+	return ids
+}
+
+func UpdateItem(db *gorm.DB, id, title string, amount int, labels []dto.LabelResponse) (*dto.ItemResponse, error) {
 	if err := db.Model(&model.Item{}).Where("id = ?", id).Updates(map[string]interface{}{"title": title, "amount": amount}).Error; err != nil {
 		return nil, err
 	}
-	
+
 	var updatedItem model.Item
 	if err := db.Where("id = ?", id).First(&updatedItem).Error; err != nil {
 		return nil, err
 	}
-	
-	labels, err := SelectItemsLabels(db, id)
+
+	if err := UpdateItemLabelsWithNew(db, id, labels); err != nil {
+		return nil, err
+	}
+
+	labelsDb, err := SelectItemsLabels(db, id)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	var labelsDto []dto.LabelResponse
-	if labels != nil {
-		labelsDto = *labels
+	if labelsDb != nil {
+		labelsDto = *labelsDb
 	}
-	
+
 	itemResponse := &dto.ItemResponse{
 		Id:     updatedItem.Id.String(),
 		Title:  updatedItem.Title,
 		Amount: updatedItem.Amount,
 		Labels: labelsDto,
 	}
-	
+
 	return itemResponse, nil
 }
