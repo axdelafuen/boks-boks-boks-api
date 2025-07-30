@@ -1,6 +1,8 @@
 package model
 
 import (
+	"main/utils"
+
 	uuid "github.com/google/uuid"
 )
 
@@ -11,10 +13,15 @@ type User struct {
 	Boxes    []Box     `gorm:"-"`
 }
 
-func InitUser(username, password string) *User {
+func InitUser(username, password string) (*User, error) {
+	hashedPassword, err := utils.HashPassword(password)
+	if err != nil {
+		return nil, err
+	}
+
 	return &User{
 		Id:       uuid.New(),
 		Username: username,
-		Password: password,
-	}
+		Password: hashedPassword,
+	}, nil
 }
