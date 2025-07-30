@@ -94,3 +94,21 @@ func (h *BoxHandler) UpdateBox(c *gin.Context) {
 
 	response.OKResponse(c, "box updated", nil)
 }
+
+func (h *BoxHandler) GetBoxContainItemWithTitle(c *gin.Context) {
+	userId, err := middleware.GetUserIDFromContext(c)
+	if err != nil {
+		response.BadRequestError(c, err.Error())
+		return
+	}
+
+	itemTitle := c.Param("title")
+
+	boxId, err := h.boxService.GetBoxContainItemWithTitle(userId, itemTitle)
+	if err != nil {
+		response.InternalServerError(c, err.Error())
+		return
+	}
+
+	response.OKResponse(c, "box id find", boxId)
+}

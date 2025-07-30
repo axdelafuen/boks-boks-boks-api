@@ -145,3 +145,12 @@ func (s *BoxService) UpdateBox(userID uuid.UUID, req dto.UpdateBoxRequest) error
 
 	return nil
 }
+
+func (s *BoxService) GetBoxContainItemWithTitle(userId uuid.UUID, itemTitle string) ([]string, error) {
+	boxId, err := database.SelectBoxIdContainsItemWithTitle(s.db, userId.String(), itemTitle)
+	if err != nil {
+		return nil, fmt.Errorf("could not find any box containing items: %w", err)
+	}
+
+	return boxId, nil
+}

@@ -1,6 +1,8 @@
 package database
 
 import (
+	"fmt"	
+
 	"main/model"
 
 	"gorm.io/gorm"
@@ -55,4 +57,23 @@ func CheckBoxOwnItem(db *gorm.DB, boxId, itemId string) ([]string, error) {
 	}
 
 	return itemIds, nil
+}
+
+func SelectBoxIdContainsItemWithTitle(db *gorm.DB, userId, itemTitle string) ([]string, error) {
+	var boxIds []string
+
+	err := db.Table("boxes_items").
+		Joins("JOIN users_boxes ON users_boxes.boxid = boxes_items.boxId").
+		Joins("JOIN items ON boxes_items.itemid = items.id").
+		Where("users_boxes.userid = ?", userId).
+		Where("items.title ILIKE ?", fmt.Sprintf("%%%s%%", itemTitle)).
+		Select("boxes_items.boxid").
+		Distinct().
+		Pluck("boxes_items.boxid", &boxIds).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return boxIds, nil
 }
