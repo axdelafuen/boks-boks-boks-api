@@ -55,3 +55,8 @@ type CreateLabelRequest struct {
 	Color       string `json:"color"`
 	Description string `json:"description"`
 }
+
+// TODO - add stats info about user for /profile page
+type UserResponse struct {
+  Username string `json:"username"`
+}
