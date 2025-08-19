@@ -18,6 +18,7 @@ type Server struct {
 	dbManager    *database.Manager
 	jwtSecret    string
 	authHandler  *handler.AuthHandler
+	userHandler  *handler.UserHandler
 	boxHandler   *handler.BoxHandler
 	itemHandler  *handler.ItemHandler
 	labelHandler *handler.LabelHandler
@@ -35,11 +36,13 @@ func NewServer() (*Server, error) {
 	}
 
 	authService := service.NewAuthService(dbManager.GetDB(), jwtSecret)
+	userService := service.NewUserService(dbManager.GetDB())
 	boxService := service.NewBoxService(dbManager.GetDB())
 	itemService := service.NewItemService(dbManager.GetDB())
 	labelService := service.NewLabelService(dbManager.GetDB())
 
 	authHandler := handler.NewAuthHandler(authService)
+	userHandler := handler.NewUserHandler(userService)
 	boxHandler := handler.NewBoxHandler(boxService)
 	itemHandler := handler.NewItemHandler(itemService)
 	labelHandler := handler.NewLabelHandler(labelService)
@@ -49,6 +52,7 @@ func NewServer() (*Server, error) {
 		dbManager:    dbManager,
 		jwtSecret:    jwtSecret,
 		authHandler:  authHandler,
+		userHandler:  userHandler,
 		boxHandler:   boxHandler,
 		itemHandler:  itemHandler,
 		labelHandler: labelHandler,
@@ -75,6 +79,8 @@ func (s *Server) setupRoutes() {
 	api := s.router.Group("/api")
 	api.Use(middleware.AuthMiddleware(s.jwtSecret))
 	{
+		api.GET("/user/:username", s.userHandler.GetUser)
+
 		api.GET("/boxes", s.boxHandler.GetBoxes)
 		api.POST("/boxes", s.boxHandler.CreateBox)
 		api.PUT("/boxes", s.boxHandler.UpdateBox)
