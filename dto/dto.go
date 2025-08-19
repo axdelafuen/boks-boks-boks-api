@@ -58,5 +58,5 @@ type CreateLabelRequest struct {
 
 // TODO - add stats info about user for /profile page
 type UserResponse struct {
-  Username string `json:"username"`
+	Username string `json:"username"`
 }

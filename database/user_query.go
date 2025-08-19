@@ -42,11 +42,11 @@ func CheckUserOwnItem(db *gorm.DB, userId, itemId string) ([]string, error) {
 }
 
 func SelectUserWithId(db *gorm.DB, userId, username string) (*[]model.User, error) {
-  var users []model.User
+	var users []model.User
 
-  if err := db.Where("username = ?", username).Where("id = ?", userId).Find(&users).Error; err != nil {
-    return nil, err
-  }
+	if err := db.Where("username = ?", username).Where("id = ?", userId).Find(&users).Error; err != nil {
+		return nil, err
+	}
 
-  return &users, nil
+	return &users, nil
 }
