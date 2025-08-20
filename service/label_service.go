@@ -139,3 +139,36 @@ func (s *LabelService) DeleteLabel(userId, labelId string) error {
 
 	return nil
 }
+
+func (s *LabelService) UpdateLabel(userId string, label dto.UpdateLabelRequest) (*dto.LabelResponse, error) {
+	labelsId, err := database.CheckUserOwnLabel(s.db, userId, label.Id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch data: %w", err)
+	}
+
+	if len(labelsId) == 0 {
+		return nil, fmt.Errorf("label %s is not related to user %d", label.Id, userId)
+	}
+
+	tx := s.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := database.UpdateLabel(tx, label.Id, label.Title, label.Description, label.Color); err != nil {
+		return nil, fmt.Errorf("error while updating: %w", err)
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return nil, fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	newLabel, err := database.SelectLabelWithId(s.db, label.Id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch data: %w", err)
+	}
+
+	return &dto.LabelResponse{Id: newLabel.Id.String(), Title: newLabel.Title, Description: newLabel.Description, Color: newLabel.Color}, nil
+}
