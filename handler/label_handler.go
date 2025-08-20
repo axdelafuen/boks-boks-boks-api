@@ -91,3 +91,25 @@ func (h *LabelHandler) DeleteLabel(c *gin.Context) {
 
 	response.SuccessResponse(c, 201, "Label deleted", nil)
 }
+
+func (h *LabelHandler) UpdateLabel(c *gin.Context) {
+	userId, err := middleware.GetUserIDFromContext(c)
+	if err != nil {
+		response.BadRequestError(c, err.Error())
+		return
+	}
+
+	var req dto.UpdateLabelRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.BadRequestError(c, "invalid request format: "+err.Error())
+		return
+	}
+
+	label, err := h.labelService.UpdateLabel(userId.String(), req)
+	if err != nil {
+		response.InternalServerError(c, err.Error())
+		return
+	}
+
+	response.OKResponse(c, "Label updated", label)
+}

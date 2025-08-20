@@ -57,3 +57,21 @@ func SelectItemsLabels(db *gorm.DB, itemId string) (*[]dto.LabelResponse, error)
 func DeleteLabel(db *gorm.DB, labelId string) error {
 	return db.Where("id = ?", labelId).Delete(&model.Label{}).Error
 }
+
+func UpdateLabel(db *gorm.DB, id, title, description, color string) error {
+	if err := db.Model(&model.Label{}).Where("id = ?", id).Updates(map[string]interface{}{"title": title, "description": description, "color": color}).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func SelectLabelWithId(db *gorm.DB, id string) (*model.Label, error) {
+	var label model.Label
+
+	if err := db.Where("id = ?", id).First(&label).Error; err != nil {
+		return nil, err
+	}
+
+	return &label, nil
+}

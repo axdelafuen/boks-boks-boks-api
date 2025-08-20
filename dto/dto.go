@@ -50,6 +50,13 @@ type UpdateItemRequest struct {
 	Labels []LabelResponse `json:"labels"`
 }
 
+type UpdateLabelRequest struct {
+	Id          string `json:"id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Color       string `json:"Color"`
+}
+
 type CreateLabelRequest struct {
 	Title       string `json:"title"`
 	Color       string `json:"color"`
