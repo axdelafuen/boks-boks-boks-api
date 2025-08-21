@@ -50,3 +50,48 @@ func SelectUserWithId(db *gorm.DB, userId, username string) (*[]model.User, erro
 
 	return &users, nil
 }
+
+func SelectUserById(db *gorm.DB, userId string) (*model.User, error) {
+	var user model.User
+
+	if err := db.Where("id = ?", userId).First(&user).Error; err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func CountUserBoxes(db *gorm.DB, userId string) (int64, error) {
+	var count int64
+
+	if err := db.Table("users_boxes").Where("userid = ?", userId).Count(&count).Error; err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
+func CountUserItems(db *gorm.DB, userId string) (int64, error) {
+	var count int64
+
+	err := db.Table("boxes_items").
+		Joins("JOIN users_boxes ON users_boxes.boxid = boxes_items.boxid").
+		Where("users_boxes.userid = ?", userId).
+		Count(&count).Error
+
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
+func CountUserLabels(db *gorm.DB, userId string) (int64, error) {
+	var count int64
+
+	if err := db.Table("users_labels").Where("userid = ?", userId).Count(&count).Error; err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
