@@ -62,36 +62,36 @@ func SelectUserById(db *gorm.DB, userId string) (*model.User, error) {
 }
 
 func CountUserBoxes(db *gorm.DB, userId string) (int64, error) {
-    var count int64
-    
-    if err := db.Table("users_boxes").Where("userid = ?", userId).Count(&count).Error; err != nil {
-        return 0, err
-    }
-    
-    return count, nil
+	var count int64
+
+	if err := db.Table("users_boxes").Where("userid = ?", userId).Count(&count).Error; err != nil {
+		return 0, err
+	}
+
+	return count, nil
 }
 
 func CountUserItems(db *gorm.DB, userId string) (int64, error) {
-    var count int64
-    
-    err := db.Table("boxes_items").
-        Joins("JOIN users_boxes ON users_boxes.boxid = boxes_items.boxid").
-        Where("users_boxes.userid = ?", userId).
-        Count(&count).Error
-    
-    if err != nil {
-        return 0, err
-    }
-    
-    return count, nil
+	var count int64
+
+	err := db.Table("boxes_items").
+		Joins("JOIN users_boxes ON users_boxes.boxid = boxes_items.boxid").
+		Where("users_boxes.userid = ?", userId).
+		Count(&count).Error
+
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
 }
 
 func CountUserLabels(db *gorm.DB, userId string) (int64, error) {
-    var count int64
-    
-    if err := db.Table("users_labels").Where("userid = ?", userId).Count(&count).Error; err != nil {
-        return 0, err
-    }
-    
-    return count, nil
+	var count int64
+
+	if err := db.Table("users_labels").Where("userid = ?", userId).Count(&count).Error; err != nil {
+		return 0, err
+	}
+
+	return count, nil
 }

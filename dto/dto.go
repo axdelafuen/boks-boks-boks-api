@@ -64,12 +64,13 @@ type CreateLabelRequest struct {
 }
 
 type UserResponse struct {
+	Id       string `json:"id"`
 	Username string `json:"username"`
 }
 
 type UserMetadataResponse struct {
 	UserResponse
-	TotalBoxes    int `json:"total_boxes"`
-	TotalItems    int `json:"total_items"`
-	TotalLabels   int `json:"total_labels"`
+	TotalBoxes  int `json:"total_boxes"`
+	TotalItems  int `json:"total_items"`
+	TotalLabels int `json:"total_labels"`
 }
