@@ -25,3 +25,10 @@ func InitUser(username, password string) (*User, error) {
 		Password: hashedPassword,
 	}, nil
 }
+
+type UserMetadata struct {
+	User
+	TotalBoxes  int `json:"total_boxes"`
+	TotalItems  int `json:"total_items"`
+	TotalLabels int `json:"total_labels"`
+}

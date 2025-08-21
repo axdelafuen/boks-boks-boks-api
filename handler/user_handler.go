@@ -35,3 +35,19 @@ func (h *UserHandler) GetUser(c *gin.Context) {
 
 	response.OKResponse(c, "User datas fetched", user)
 }
+
+func (h *UserHandler) GetUserMetadata(c *gin.Context) {
+    userId, err := middleware.GetUserIDFromContext(c)
+    if err != nil {
+        response.InternalServerError(c, err.Error())
+        return
+    }
+    
+    userMetadata, err := h.userService.GetUserMetadata(userId.String())
+    if err != nil {
+        response.InternalServerError(c, err.Error())
+        return
+    }
+    
+    response.OKResponse(c, "User metadata fetched", userMetadata)
+}
