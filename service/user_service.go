@@ -32,35 +32,35 @@ func (s *UserService) GetUser(userId, username string) (*dto.UserResponse, error
 	return &dto.UserResponse{Username: (*users)[0].Username}, nil
 }
 
-func (s *UserService) GetUserMetadata(userId string) (*dto.UserMetadataResponse, error) {
-	user, err := database.SelectUserById(s.db, userId)
+func (s *UserService) GetUserMetadata(username string) (*dto.UserMetadataResponse, error) {
+	user, err := database.SelectUser(s.db, username)
 
 	if err != nil {
 		return nil, fmt.Errorf("Could not fecth user: %w", err)
 	}
 
 	if user == nil {
-		return nil, fmt.Errorf("No user with ID %s accessible with your token", userId)
+		return nil, fmt.Errorf("No user with username %s accessible with your token", username)
 	}
 
-	boxCount, err := database.CountUserBoxes(s.db, userId)
+	boxCount, err := database.CountUserBoxes(s.db, user.Id.String())
 	if err != nil {
 		return nil, fmt.Errorf("Could not count user boxes: %w", err)
 	}
 
-	itemCount, err := database.CountUserItems(s.db, userId)
+	itemCount, err := database.CountUserItems(s.db, user.Id.String())
 	if err != nil {
 		return nil, fmt.Errorf("Could not count user items: %w", err)
 	}
 
-	labelCount, err := database.CountUserLabels(s.db, userId)
+	labelCount, err := database.CountUserLabels(s.db, user.Id.String())
 	if err != nil {
 		return nil, fmt.Errorf("Could not count user labels: %w", err)
 	}
 
 	return &dto.UserMetadataResponse{
 		UserResponse: dto.UserResponse{
-			Id:       userId,
+			Id:       user.Id.String(),
 			Username: user.Username,
 		},
 		TotalBoxes:  int(boxCount),

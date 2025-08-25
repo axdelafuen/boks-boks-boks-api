@@ -37,13 +37,15 @@ func (h *UserHandler) GetUser(c *gin.Context) {
 }
 
 func (h *UserHandler) GetUserMetadata(c *gin.Context) {
-	userId, err := middleware.GetUserIDFromContext(c)
+	_, err := middleware.GetUserIDFromContext(c)
 	if err != nil {
 		response.InternalServerError(c, err.Error())
 		return
 	}
 
-	userMetadata, err := h.userService.GetUserMetadata(userId.String())
+	username := c.Param("username")
+
+	userMetadata, err := h.userService.GetUserMetadata(username)
 	if err != nil {
 		response.InternalServerError(c, err.Error())
 		return
