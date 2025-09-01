@@ -79,7 +79,8 @@ func (s *Server) setupRoutes() {
 	api := s.router.Group("/api")
 	api.Use(middleware.AuthMiddleware(s.jwtSecret))
 	{
-		api.GET("/user/:username", s.userHandler.GetUser)
+		api.GET("/user", s.userHandler.GetUser)
+		api.GET("/user/:username", s.userHandler.GetUserWithUsername)
 		api.GET("/user/:username/metadata", s.userHandler.GetUserMetadata)
 
 		api.GET("/boxes", s.boxHandler.GetBoxes)

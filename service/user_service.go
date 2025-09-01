@@ -19,8 +19,17 @@ func NewUserService(db *gorm.DB) *UserService {
 	}
 }
 
-func (s *UserService) GetUser(userId, username string) (*dto.UserResponse, error) {
-	users, err := database.SelectUserWithId(s.db, userId, username)
+func (s *UserService) GetUser(userId string) (*dto.UserResponse, error) {
+	user, err := database.SelectUserById(s.db, userId)
+	if err != nil {
+		return nil, fmt.Errorf("Could not fetch user: %w", err)
+	}
+
+	return &dto.UserResponse{Id: user.Id.String(), Username: user.Username}, nil
+}
+
+func (s *UserService) GetUserWithUsername(userId, username string) (*dto.UserResponse, error) {
+	users, err := database.SelectUserWithIdAndUsername(s.db, userId, username)
 	if err != nil {
 		return nil, fmt.Errorf("Could not fecth user: %w", err)
 	}
