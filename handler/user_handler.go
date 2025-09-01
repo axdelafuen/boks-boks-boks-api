@@ -25,9 +25,25 @@ func (h *UserHandler) GetUser(c *gin.Context) {
 		return
 	}
 
+	user, err := h.userService.GetUser(userId.String())
+	if err != nil {
+		response.InternalServerError(c, err.Error())
+		return
+	}
+
+	response.OKResponse(c, "User datas fetched", user)
+}
+
+func (h *UserHandler) GetUserWithUsername(c *gin.Context) {
+	userId, err := middleware.GetUserIDFromContext(c)
+	if err != nil {
+		response.InternalServerError(c, err.Error())
+		return
+	}
+
 	username := c.Param("username")
 
-	user, err := h.userService.GetUser(userId.String(), username)
+	user, err := h.userService.GetUserWithUsername(userId.String(), username)
 	if err != nil {
 		response.InternalServerError(c, err.Error())
 		return

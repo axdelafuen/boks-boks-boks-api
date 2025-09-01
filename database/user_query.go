@@ -41,7 +41,7 @@ func CheckUserOwnItem(db *gorm.DB, userId, itemId string) ([]string, error) {
 	return itemsId, nil
 }
 
-func SelectUserWithId(db *gorm.DB, userId, username string) (*[]model.User, error) {
+func SelectUserWithIdAndUsername(db *gorm.DB, userId, username string) (*[]model.User, error) {
 	var users []model.User
 
 	if err := db.Where("username = ?", username).Where("id = ?", userId).Find(&users).Error; err != nil {
